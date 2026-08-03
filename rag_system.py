@@ -1,13 +1,16 @@
 import os
 import streamlit as st
+from pydantic import SecretStr
 from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 from langchain_community.vectorstores import Chroma
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-from pydantic import SecretStr
 
+from config import *
 from prompts.prompts import *
+from services.document_formatter import format_docs
 from services.retriever_builder import crear_retriever_base, crear_multi_query_retriever
-from config import EMBEDDING_MODEL, CHROMA_DB_PATH, QUERY_MODEL, GENERATIVE_MODEL, SEARCH_TYPE, SEARCH_K, MMR_FETCH_K, MMR_DIVERSITY_LAMBDA
 
 @st.cache_resource
 def initialize_rag_system():
@@ -50,10 +53,50 @@ def initialize_rag_system():
     multi_query_prompt = PromptTemplate.from_template(MULTI_QUERY_PROMPT)
 
     # MultiQueryRetriever con prompt personalizado
-    multi_query_retriever = crear_multi_query_retriever(
+    mmr_multi_retriever = crear_multi_query_retriever(
         base_retriever=base_retriever,
         llm=llm_queries,
         prompt=multi_query_prompt
     )
 
     prompt = PromptTemplate.from_template(RAG_TEMPLATE)
+
+    rag_chain = (
+        {
+            "context": mmr_multi_retriever | format_docs,
+            "question": RunnablePassthrough()
+        } 
+        | prompt
+        | llm_generative 
+        | StrOutputParser()
+    )
+
+    return rag_chain, mmr_multi_retriever
+
+
+def query_rag(question):
+    try:
+        rag_chain, retriever = initialize_rag_system()
+
+        # Obtener respuesta
+        response = rag_chain.invoke(question)
+
+        # Obtener documentos para mostrarlos
+        docs = retriever.invoke(question)
+
+        # Formatera los documentos para mostrarlos
+        docs_info = []
+        for i, doc in enumerate(docs[:SEARCH_K], 1):
+            docs_info.append({
+                "fragmento": i,
+                "contenido": doc.page_content[:1000] + "..." if len(doc.page_content) > 1000 else doc.page_content,
+                "fuente": doc.metadata.get("source", "No especificada"),
+                "pagina": doc.metadata.get("page", "No especificada")
+            })
+
+        return response, docs_info    
+
+    except Exception as e:
+        error_msg = f"Error al procesar la pregunta: {str(e)}"
+        return error_msg, []
+           
