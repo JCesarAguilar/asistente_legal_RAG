@@ -99,4 +99,14 @@ def query_rag(question):
     except Exception as e:
         error_msg = f"Error al procesar la pregunta: {str(e)}"
         return error_msg, []
-           
+
+
+def get_retriever_info():
+    """Obtiene informacion sobre la configuracion del retriever"""
+    return {
+        "tipo": f"{SEARCH_TYPE.upper()}",
+        "documentos": SEARCH_K,
+        "diversidad": MMR_DIVERSITY_LAMBDA,
+        "candidatos": MMR_FETCH_K,
+        "umbral": None
+    }           
