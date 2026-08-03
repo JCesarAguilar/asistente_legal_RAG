@@ -13,9 +13,9 @@ GENERATIVE_MODEL = "gemini-3.5-flash"       # modelo mas potente para generar re
 
 # Configuracion del retriever
 SEARCH_TYPE = "mmr"  # Tipo de búsqueda: "mmr" (Maximal Margin Relevance) o "similarity" (similaridad)
+SEARCH_K = 2  # Número de documentos finales a devolver después de aplicar MMR
 MMR_DIVERSITY_LAMBDA = 0.7  # Parámetro de diversidad para MMR (0.0 a 1.0, donde 0.0 es menos diverso y 1.0 es más diverso)
 MMR_FETCH_K = 20  # Número de documentos a recuperar antes de aplicar MMR
-SEARCH_K = 2  # Número de documentos finales a devolver después de aplicar MMR
 
 # Configuracion alternativa para retriever hibrido
 ENABLE_HYBRID_SEARCH = True  # Habilitar búsqueda híbrida (MMR + Similaridad)
