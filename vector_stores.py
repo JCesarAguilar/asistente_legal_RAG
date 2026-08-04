@@ -5,7 +5,7 @@ import os
 from pydantic import SecretStr
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
-from config import EMBEDDING_MODEL, CHROMA_DB_PATH
+from config import  CHROMA_DB_PATH
 from services import (
     cargar_documentos,
     calidad_ocr_sospechosa,
@@ -13,6 +13,7 @@ from services import (
     dividir_en_chunks,
     construir_vectorstore
 )
+from services.llm_provider import obtener_embeddings
 
 DIRECTORIO_DOCUMENTOS = os.getenv("DIRECTORIO_DOCUMENTOS", "documentos")
 CHROMA_DB_PATH: str = os.getenv("CHROMA_DB_PATH", "vectorstore")
@@ -54,10 +55,7 @@ def main():
     print(f"{len(chunks)} chunks generados.")
 
     print("4. Construyendo vectorstore...")
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model=EMBEDDING_MODEL,
-        api_key=SecretStr(os.getenv("GOOGLE_API_KEY", ""))
-    )
+    embeddings = obtener_embeddings()
     construir_vectorstore(chunks, embeddings, CHROMA_DB_PATH)
     print(f"Vectorstore construido en: {CHROMA_DB_PATH}")
 
