@@ -23,7 +23,7 @@ GENERATIVE_MODEL_OLLAMA = "llama3.2"
 
 # Configuracion del retriever
 SEARCH_TYPE = "mmr"  # Tipo de búsqueda: "mmr" (Maximal Margin Relevance) o "similarity" (similaridad)
-SEARCH_K = 2  # Número de documentos finales a devolver después de aplicar MMR
-MMR_DIVERSITY_LAMBDA = 0.7  # Parámetro de diversidad para MMR (0.0 a 1.0, donde 0.0 es menos diverso y 1.0 es más diverso)
-MMR_FETCH_K = 10  # Número de documentos a recuperar antes de aplicar MMR
+SEARCH_K = 5  # Número de documentos finales a devolver después de aplicar MMR
+MMR_DIVERSITY_LAMBDA = 0.5  # Parámetro de diversidad para MMR (0.0 a 1.0, donde 0.0 es menos diverso y 1.0 es más diverso)
+MMR_FETCH_K = 20  # Número de documentos a recuperar antes de aplicar MMR
 ENSEMBLE_WEIGHTS = [0.7, 0.3] 

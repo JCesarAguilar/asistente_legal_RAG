@@ -11,9 +11,10 @@ from services import (
     calidad_ocr_sospechosa,
     reprocesar_pagina,
     dividir_en_chunks,
-    construir_vectorstore
+    construir_vectorstore,
+    enriquecer_con_materia,
+    obtener_embeddings
 )
-from services.llm_provider import obtener_embeddings
 
 DIRECTORIO_DOCUMENTOS = os.getenv("DIRECTORIO_DOCUMENTOS", "documentos")
 CHROMA_DB_PATH: str = os.getenv("CHROMA_DB_PATH", "vectorstore")
@@ -46,6 +47,8 @@ def main():
     print("1. Cargando documentos...")
     documentos = cargar_documentos(DIRECTORIO_DOCUMENTOS)
     print(f"{len(documentos)} páginas cargadas.")
+
+    documentos = enriquecer_con_materia(documentos)
 
     print("2. Verificando calidad OCR...")
     documentos = reprocesar_documentos_con_ocr(documentos)

@@ -1,6 +1,6 @@
 from langchain_core.documents import Document
 
-
+  
 def format_docs(docs: list[Document]) -> str:
     """
     Formatea una lista de documentos recuperados en un string legible,
@@ -12,16 +12,17 @@ def format_docs(docs: list[Document]) -> str:
         header = f"[Fragmento {i}]"
 
         if doc.metadata:
+            materia = doc.metadata.get("materia")
+            if materia:
+                header += f" (Materia: {materia})"   # 👈 nueva línea
+
             fuente_raw = doc.metadata.get("source", "")
             if fuente_raw:
-                # Soporta rutas de Windows (\) y Unix/Mac (/)
                 fuente = fuente_raw.split("\\")[-1] if "\\" in fuente_raw else fuente_raw.split("/")[-1]
                 header += f" (Fuente: {fuente})"
 
             pagina = doc.metadata.get("page")
             if pagina is not None:
-                # +1 porque las páginas se indexan desde 0 internamente,
-                # pero los humanos cuentan desde la página 1
                 header += f" (Página: {pagina + 1})"
 
         contenido = doc.page_content.strip()
