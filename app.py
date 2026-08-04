@@ -82,3 +82,4 @@ st.markdown(
     "<div style='text-align: center; color: #666;'>🏛️ Asistente Legal con MMR Retriever</div>", 
     unsafe_allow_html=True
 )
+

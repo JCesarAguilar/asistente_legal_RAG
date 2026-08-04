@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import os
 import streamlit as st
 from pydantic import SecretStr
@@ -10,7 +13,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmb
 from config import *
 from prompts.prompts import *
 from services.document_formatter import format_docs
-from services.retriever_builder import crear_retriever_base, crear_multi_query_retriever
+from services.retriever_builder import crear_retriever_base, crear_multi_query_retriever, crear_similarity_retriever, crear_ensemble_retriever
+from services.llm_provider import obtener_embeddings, obtener_llm_queries, obtener_llm_generativo
 
 @st.cache_resource
 def initialize_rag_system():
@@ -18,12 +22,7 @@ def initialize_rag_system():
     Inicializa todo el sistema RAG (vectorstore, modelos, retriever, cadena)
     Se cachea con @st.cache_resource para no reconstruirlo en cada intercaccion del usuario.
     """
-
-    # Vector Store
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model=EMBEDDING_MODEL,
-        api_key=SecretStr(os.environ["GOOGLE_API_KEY"])
-    )
+    embeddings = obtener_embeddings()
 
     vectorstore = Chroma(
     embedding_function=embeddings, 
@@ -31,14 +30,8 @@ def initialize_rag_system():
     )
 
     # Modelos
-    llm_queries = ChatGoogleGenerativeAI(
-        model=QUERY_MODEL,
-        api_key=SecretStr(os.environ["GOOGLE_API_KEY"])
-    )
-    llm_generative = ChatGoogleGenerativeAI(
-        model=GENERATIVE_MODEL,
-        api_key=SecretStr(os.environ["GOOGLE_API_KEY"])
-    )
+    llm_queries = obtener_llm_queries()
+    llm_generative = obtener_llm_generativo()
 
     # Retriever MMR (Maximal Margin Relevance)
     base_retriever = crear_retriever_base(
@@ -59,11 +52,23 @@ def initialize_rag_system():
         prompt=multi_query_prompt
     )
 
+    # Retriever de similitud simple
+    similarity_retriever = crear_similarity_retriever(
+        vectorstore=vectorstore,
+        k=SEARCH_K
+    )
+
+    # Combinar ambos retrievers en un EnsembleRetriever
+    ensemble_retriever = crear_ensemble_retriever(
+        retrievers=[mmr_multi_retriever, similarity_retriever],
+        weights=ENSEMBLE_WEIGHTS  # Ajusta los pesos según tus necesidades
+    )
+
     prompt = PromptTemplate.from_template(RAG_TEMPLATE)
 
     rag_chain = (
         {
-            "context": mmr_multi_retriever | format_docs,
+            "context": ensemble_retriever | format_docs,
             "question": RunnablePassthrough()
         } 
         | prompt
@@ -71,7 +76,7 @@ def initialize_rag_system():
         | StrOutputParser()
     )
 
-    return rag_chain, mmr_multi_retriever
+    return rag_chain, ensemble_retriever
 
 
 def query_rag(question):
@@ -104,9 +109,9 @@ def query_rag(question):
 def get_retriever_info():
     """Obtiene informacion sobre la configuracion del retriever"""
     return {
-        "tipo": f"{SEARCH_TYPE.upper()}",
+        "tipo": f"{SEARCH_TYPE.upper()} + MultiQuery + Similarity (Ensemble)",
         "documentos": SEARCH_K,
         "diversidad": MMR_DIVERSITY_LAMBDA,
         "candidatos": MMR_FETCH_K,
-        "umbral": None
+        "pesos_ensemble": ENSEMBLE_WEIGHTS
     }           
