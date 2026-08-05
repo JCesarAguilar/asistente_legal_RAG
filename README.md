@@ -68,7 +68,7 @@ Esta separación permite, por ejemplo, cambiar de proveedor de LLM o de vector s
 **1. Clona el repositorio**
 
 ```bash
-git clone https://github.com/tu-usuario/asistente-legal-rag.git
+git clone https://github.com/JCesarAguilar/asistente_legal_RAG
 cd asistente-legal-rag
 ```
 
