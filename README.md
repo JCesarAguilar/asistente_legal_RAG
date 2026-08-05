@@ -2,7 +2,7 @@
 
 Sistema de consulta normativa inteligente para abogados peruanos, construido con Retrieval Augmented Generation (RAG). Permite consultar en lenguaje natural la Constitución y los principales códigos y leyes del Perú, obteniendo respuestas precisas con citas exactas de artículo y código.
 
-🔗 **Demo en vivo:** [agrega aquí tu link de Streamlit Cloud]
+🔗 **Demo en vivo:** [[agrega aquí tu link de Streamlit Cloud](https://jcesaraguilar-asistente-legal-rag-app-dvxyfy.streamlit.app/)]
 
 ![Asistente Legal RAG Demo](assets/demo.png)
 
