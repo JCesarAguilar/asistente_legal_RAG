@@ -1,9 +1,6 @@
 import os
 from pydantic import SecretStr
-from langchain_core.embeddings import Embeddings
-from langchain_core.language_models import BaseChatModel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_ollama import ChatOllama, OllamaEmbeddings
 
 from config import (
     EMBEDDING_MODEL_OPENAI, QUERY_MODEL_OPENAI, GENERATIVE_MODEL_OPENAI,
