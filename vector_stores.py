@@ -1,11 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-import os
-from pydantic import SecretStr
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-
-from config import  CHROMA_DB_PATH
+from config import DIRECTORIO_DOCUMENTOS, PINECONE_INDEX_NAME
 from services import (
     cargar_documentos,
     calidad_ocr_sospechosa,
@@ -16,21 +12,13 @@ from services import (
     obtener_embeddings
 )
 
-DIRECTORIO_DOCUMENTOS = os.getenv("DIRECTORIO_DOCUMENTOS", "documentos")
-CHROMA_DB_PATH: str = os.getenv("CHROMA_DB_PATH", "vectorstore")
-
 
 def reprocesar_documentos_con_ocr(documentos: list) -> list:
-    """
-    Detecta páginas con OCR de baja calidad y las reprocesa 
-    usando Tesseract sobre una versions en imagen de alta resolucion
-    """
     for doc in documentos:
         if calidad_ocr_sospechosa(doc.page_content):
             ruta_pdf = doc.metadata.get("source")
             pagina = doc.metadata.get("page", 0)
             print(f"Reprocesando OCR: {ruta_pdf} - página {pagina + 1}")
-
             try:
                 texto_corregido = reprocesar_pagina(ruta_pdf, pagina)
                 if texto_corregido.strip():
@@ -39,7 +27,6 @@ def reprocesar_documentos_con_ocr(documentos: list) -> list:
             except Exception as e:
                 print(f"Error al reprocesar página {pagina + 1}: {e}")
                 doc.metadata["ocr_reprocesado"] = False
-
     return documentos
 
 
@@ -57,12 +44,11 @@ def main():
     chunks = dividir_en_chunks(documentos)
     print(f"{len(chunks)} chunks generados.")
 
-    print("4. Construyendo vectorstore...")
+    print("4. Construyendo vectorstore en Pinecone...")
     embeddings = obtener_embeddings()
-    construir_vectorstore(chunks, embeddings, CHROMA_DB_PATH)
-    print(f"Vectorstore construido en: {CHROMA_DB_PATH}")
+    construir_vectorstore(chunks, embeddings, PINECONE_INDEX_NAME)
+    print(f"Vectorstore construido en Pinecone, índice: {PINECONE_INDEX_NAME}")
 
 
 if __name__ == "__main__":
-    main()    
-    
+    main()

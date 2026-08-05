@@ -1,14 +1,11 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-import os
 import streamlit as st
-from pydantic import SecretStr
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain_community.vectorstores import Chroma
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_pinecone import PineconeVectorStore
 
 from config import *
 from prompts.prompts import *
@@ -24,9 +21,9 @@ def initialize_rag_system():
     """
     embeddings = obtener_embeddings()
 
-    vectorstore = Chroma(
-    embedding_function=embeddings, 
-    persist_directory=CHROMA_DB_PATH
+    vectorstore = PineconeVectorStore(
+        index_name=PINECONE_INDEX_NAME,
+        embedding=embeddings
     )
 
     # Modelos

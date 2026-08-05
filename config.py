@@ -4,22 +4,14 @@ from pathlib import Path
 # Rutas del proyecto (ancladas al propio archivo, no ha rutas absolutas)
 PROJECT_ROOT = Path(__file__).parent
 DIRECTORIO_DOCUMENTOS = os.getenv("DIRECTORIO_DOCUMENTOS", str(PROJECT_ROOT / "documentos"))
-CHROMA_DB_PATH = os.getenv("CHROMA_DB_PATH", str(PROJECT_ROOT / "chroma_db"))
 
-# Proveedor de modelos: gemini o ollama
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini")
+# Proveedor de vectorstore: 
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "asistente-legal-rag")
 
-
-# Modelos Gemini
-EMBEDDING_MODEL_GEMINI = "models/gemini-embedding-001"
-QUERY_MODEL_GEMINI = "gemini-3.5-flash-lite"       
-GENERATIVE_MODEL_GEMINI = "gemini-3.5-flash"
-
-# Modelos Ollama
-EMBEDDING_MODEL_OLLAMA = "nomic-embed-text"
-QUERY_MODEL_OLLAMA = "llama3.2"
-GENERATIVE_MODEL_OLLAMA = "llama3.2"
-
+# Modelos Openai
+EMBEDDING_MODEL_OPENAI = "text-embedding-3-small"
+QUERY_MODEL_OPENAI = "gpt-4o-mini"
+GENERATIVE_MODEL_OPENAI = "gpt-4o"
 
 # Configuracion del retriever
 SEARCH_TYPE = "mmr"  # Tipo de búsqueda: "mmr" (Maximal Margin Relevance) o "similarity" (similaridad)
