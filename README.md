@@ -4,7 +4,7 @@ Sistema de consulta normativa inteligente para abogados peruanos, construido con
 
 🔗 **Demo en vivo:** [agrega aquí tu link de Streamlit Cloud]
 
-![Asistente Legal RAG Demo](agrega-aqui-tu-screenshot.png)
+![Asistente Legal RAG Demo](assets/demo.png)
 
 ---
 

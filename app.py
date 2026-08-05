@@ -9,7 +9,7 @@ st.set_page_config(
 )
 
 # Título
-st.title("⚖️ Sistema RAG - Asistente Legal")
+st.title("⚖️ Sistema RAG - Asistente Legal Peruano 🇵🇪")
 st.divider()
 
 # Inicializar el historial de chat
@@ -79,7 +79,7 @@ if prompt := st.chat_input("Escribe tu consulta sobre contratos de arrendamiento
 # Footer
 st.divider()
 st.markdown(
-    "<div style='text-align: center; color: #666;'>🏛️ Asistente Legal con MMR Retriever</div>", 
+    "<div style='text-align: center; color: #666;'>🏛️ Asistente Legal con Ensembled Retriever</div>", 
     unsafe_allow_html=True
 )
 
